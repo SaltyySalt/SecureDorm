@@ -45,13 +45,20 @@ mongoose.connect(process.env.MONGO_URI, {
 
 // GET: registration page
 app.get('/register', (req, res) => {
-  const uid = req.query.uid || '';
+  const uid = req.query.uid;
+  if (!uid) return res.status(400).send('❌ UID missing in query');
   console.log("🌐 UID from query:", uid);
   res.render('register', { uid });
 });
 
 // POST: form submission
 app.post('/register', upload.single('photo'), async (req, res) => {
+  const { uid, name, matric, phone } = req.body;
+  console.log("📥 POST body:", req.body);
+  console.log("📥 UID from body:", uid);
+
+  if (!uid) return res.status(400).send('❌ UID is required');
+  
   try {
     const { uid, name, matric, phone } = req.body;
     const photo = req.file ? `/uploads/${req.file.filename}` : null;

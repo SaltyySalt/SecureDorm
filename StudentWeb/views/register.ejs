@@ -6,8 +6,8 @@
 <body>
   <h1>Register Card</h1>
   <form action="/register" method="POST" enctype="multipart/form-data">
-    <!-- Hidden UID Field -->
-    <input type="hidden" name="uid" value="<%= uid %>">
+    <label>Card UID:</label><br>
+    <input type="text" name="uid" value="<%= uid %>" readonly required><br><br>
 
     <label>Name:</label><br>
     <input type="text" name="name" required><br><br>
