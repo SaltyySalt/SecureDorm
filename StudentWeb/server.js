@@ -51,8 +51,11 @@ app.post('/register', upload.single('photo'), async (req, res) => {
   const { uid, name, matric, phone } = req.body;
   const photo = req.file ? `/uploads/${req.file.filename}` : null;
 
+  console.log("📥 Received data:", { uid, name, matric, phone, photo });
+
   try {
-    // Check if user already exists
+    if (!uid) return res.status(400).send('UID is required');
+    
     const existing = await User.findOne({ uid });
     if (existing) return res.send('Card is already registered.');
 
@@ -61,10 +64,11 @@ app.post('/register', upload.single('photo'), async (req, res) => {
 
     res.send('✅ Registration successful!');
   } catch (error) {
-    console.error(error);
+    console.error("❌ Registration failed:", error);
     res.status(500).send('❌ Internal Server Error');
   }
 });
+
 
 app.get('/users', async (req, res) => {
   try {
