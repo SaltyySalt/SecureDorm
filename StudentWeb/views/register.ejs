@@ -1,16 +1,16 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Register NFC Card</title>
+  <title>Card Registration</title>
 </head>
 <body>
   <h1>Register Your NFC Card</h1>
-    <form action="/register" method="POST">
-    <input type="hidden" name="uid" value="<%= uid %>" />
+  <form method="POST" action="/register">
+    <input type="hidden" name="uid" value="<%= uid %>">
     <label>Name: <input type="text" name="name" required></label><br>
-    <label>Matric No.: <input type="text" name="matricNo" required></label><br>
-    <label>Phone No.: <input type="tel" name="phone" required></label><br>
+    <label>Matric Number: <input type="text" name="matric" required></label><br>
+    <label>Phone Number: <input type="text" name="phone" required></label><br>
     <button type="submit">Register</button>
-    </form>
+  </form>
 </body>
 </html>
