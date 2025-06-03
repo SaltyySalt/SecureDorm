@@ -87,12 +87,22 @@ app.get('/', (req, res) => {
   res.send('Server is running');
 });
 
+app.get('/register', (req, res) => {
+  const uid = req.query.uid;
+  console.log("🌐 UID from query:", uid);
+  res.render('register', { uid });
+});
+
 // 📋 Show Registration Form
 app.get('/register', (req, res) => {
   const uid = req.query.uid; // Read UID from URL query (?uid=xxxx)
   console.log("🌐 UID from query:", uid);
   res.render('register', { uid }); // Pass UID to the EJS template
 });
+
+app.post('/register', upload.single('photo'), async (req, res) => {
+  console.log("📥 POST body:", req.body);
+  console.log("📥 UID from body:", req.body.uid);
 
 // 📩 Handle Form Submission
 app.post('/register', upload.single('photo'), async (req, res) => {
