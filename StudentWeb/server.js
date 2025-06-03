@@ -93,23 +93,23 @@ app.get('/register', (req, res) => {
   res.render('register', { uid });
 });
 
-// 📋 Show Registration Form
-app.get('/register', (req, res) => {
-  const uid = req.query.uid; // Read UID from URL query (?uid=xxxx)
-  console.log("🌐 UID from query:", uid);
-  res.render('register', { uid }); // Pass UID to the EJS template
-});
+// // 📋 Show Registration Form
+// app.get('/register', (req, res) => {
+//   const uid = req.query.uid; // Read UID from URL query (?uid=xxxx)
+//   console.log("🌐 UID from query:", uid);
+//   res.render('register', { uid }); // Pass UID to the EJS template
+// });
 
 app.post('/register', upload.single('photo'), async (req, res) => {
   console.log("📥 POST body:", req.body);
   console.log("📥 UID from body:", req.body.uid);
 
-// 📩 Handle Form Submission
-app.post('/register', upload.single('photo'), async (req, res) => {
-  const { uid, name, matric, phone } = req.body; // Form fields
-  const photo = req.file ? `/uploads/${req.file.filename}` : null; // Uploaded file path
+// // 📩 Handle Form Submission
+// app.post('/register', upload.single('photo'), async (req, res) => {
+//   const { uid, name, matric, phone } = req.body; // Form fields
+//   const photo = req.file ? `/uploads/${req.file.filename}` : null; // Uploaded file path
 
-  console.log("📥 Form data received:", { uid, name, matric, phone, photo });
+//   console.log("📥 Form data received:", { uid, name, matric, phone, photo });
   
   try {
     if (!uid) return res.status(400).send('❌ UID is required');
