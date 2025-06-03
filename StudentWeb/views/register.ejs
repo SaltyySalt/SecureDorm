@@ -1,3 +1,4 @@
+<!-- views/register.ejs -->
 <!DOCTYPE html>
 <html>
 <head>
@@ -5,13 +6,22 @@
 </head>
 <body>
   <h1>Card Registration</h1>
-    <form action="/register" method="POST" enctype="multipart/form-data">
-    <input type="hidden" name="uid" value="<%= uid %>" />
-    <label>Name: <input type="text" name="name" required /></label><br>
-    <label>Matric No: <input type="text" name="matric" required /></label><br>
-    <label>Phone: <input type="text" name="phone" required /></label><br>
-    <label>Photo: <input type="file" name="photo" accept="image/*" required /></label><br>
-    <button type="submit">Submit</button>
-    </form>
+  <form action="/register" method="POST" enctype="multipart/form-data">
+    <input type="hidden" name="uid" value="<%= uid %>">
+
+    <label>Name:</label><br>
+    <input type="text" name="name" required><br>
+
+    <label>Matric:</label><br>
+    <input type="text" name="matric" required><br>
+
+    <label>Phone:</label><br>
+    <input type="text" name="phone" required><br>
+
+    <label>Photo:</label><br>
+    <input type="file" name="photo"><br><br>
+
+    <button type="submit">Register</button>
+  </form>
 </body>
 </html>

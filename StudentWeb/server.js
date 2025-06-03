@@ -17,13 +17,28 @@ mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("✅ MongoDB connected"))
   .catch(err => console.error("❌ MongoDB connection error:", err));
 
+
+const fs = require('fs');
+const uploadDir = 'public/uploads';
+
+if (!fs.existsSync(uploadDir)){
+    fs.mkdirSync(uploadDir, { recursive: true });
+}
+
 // File upload setup
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, 'public/uploads'),
-  filename: (req, file, cb) =>
-    cb(null, `${Date.now()}-${file.originalname}`)
+  destination: function (req, file, cb) {
+    cb(null, 'public/uploads/');
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + '-' + file.originalname);
+  }
 });
 const upload = multer({ storage });
+
+// View engine setup
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
 
 // GET registration form
 app.get('/register', (req, res) => {
@@ -58,6 +73,10 @@ app.get('/users', async (req, res) => {
   } catch (err) {
     res.status(500).send('❌ Error fetching users');
   }
+});
+
+app.get('/', (req, res) => {
+  res.send('Server is running');
 });
 
 // Server start
