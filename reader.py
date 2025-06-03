@@ -55,7 +55,7 @@ while True:
                 print(f"✅ Card already registered to {user.get('name', 'Unknown')}")
             else:
                 print("🆕 New card detected. Generating QR code...")
-                registration_url = REGISTRATION_SITE + uid
+                registration_url = f"{REGISTRATION_SITE}?uid={uid}"
                 generate_qr(registration_url)
             
             current_cards.add(uid)
