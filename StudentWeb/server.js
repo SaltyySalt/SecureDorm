@@ -87,38 +87,31 @@ app.get('/', (req, res) => {
   res.send('Server is running');
 });
 
+
+// 📋 Show Registration Form
 app.get('/register', (req, res) => {
-  const uid = req.query.uid;
+  const uid = req.query.uid; // Read UID from URL query (?uid=xxxx)
   console.log("🌐 UID from query:", uid);
-  res.render('register', { uid });
+  res.render('register', { uid }); // Pass UID to the EJS template
 });
 
-// // 📋 Show Registration Form
-// app.get('/register', (req, res) => {
-//   const uid = req.query.uid; // Read UID from URL query (?uid=xxxx)
-//   console.log("🌐 UID from query:", uid);
-//   res.render('register', { uid }); // Pass UID to the EJS template
-// });
-
-app.post('/register', upload.single('photo'), async (req, res) => {
-  console.log("📥 POST body:", req.body);
-  console.log("📥 UID from body:", req.body.uid);
+// app.post('/register', upload.single('photo'), async (req, res) => {
+//   console.log("📥 POST body:", req.body);
+//   console.log("📥 UID from body:", req.body.uid);
 
 // // 📩 Handle Form Submission
-// app.post('/register', upload.single('photo'), async (req, res) => {
-//   const { uid, name, matric, phone } = req.body; // Form fields
-//   const photo = req.file ? `/uploads/${req.file.filename}` : null; // Uploaded file path
+app.post('/register', upload.single('photo'), async (req, res) => {
+  const { uid, name, matric, phone } = req.body;
+  const photo = req.file ? `/uploads/${req.file.filename}` : null;
 
-//   console.log("📥 Form data received:", { uid, name, matric, phone, photo });
-  
+  console.log("📥 Received data:", { uid, name, matric, phone, photo });
+
   try {
-    if (!uid) return res.status(400).send('❌ UID is required');
+    if (!uid) return res.status(400).send('UID is required');
 
-    // Check if this UID is already registered
     const existing = await User.findOne({ uid });
-    if (existing) return res.send('⚠️ Card is already registered.');
+    if (existing) return res.send('Card is already registered.');
 
-    // Save new user
     const newUser = new User({ uid, name, matric, phone, photo });
     await newUser.save();
 
@@ -128,6 +121,7 @@ app.post('/register', upload.single('photo'), async (req, res) => {
     res.status(500).send('❌ Internal Server Error');
   }
 });
+
 
 // 👀 Show All Registered Users (as JSON)
 app.get('/users', async (req, res) => {
