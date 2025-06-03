@@ -1,8 +1,4 @@
-// server.js
-
-// ==============================
-// 📦 Import Dependencies
-// ==============================
+// Required dependencies
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
@@ -10,36 +6,36 @@ const multer = require('multer');
 const path = require('path');
 const dotenv = require('dotenv');
 const fs = require('fs');
-const User = require('./models/user'); // Mongoose model for users
 
-// ==============================
-// 📁 Load Environment Variables
-// ==============================
-dotenv.config(); // Loads variables from .env into process.env
+// Load environment variables
+dotenv.config();
 
-// ==============================
-// 🚀 Initialize App
-// ==============================
+// Import User model
+const User = require('./models/user');
+
+// Initialize app
 const app = express();
 
-// ==============================
-// 🛠️ Middleware Setup
-// ==============================
-
-// Set EJS as the view engine
+// Set up middleware
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
-
-// Serve static files (e.g., images, CSS, JS) from /public
 app.use(express.static('public'));
-
-// Parse URL-encoded POST data
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// ==============================
-// 🔌 Connect to MongoDB
-// ==============================
-mongoose.set('bufferCommands', false); // Avoid buffering if DB is not ready
+// Ensure uploads directory exists
+const uploadDir = 'public/uploads';
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+// Configure multer for file upload
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, 'public/uploads/'),
+  filename: (req, file, cb) => cb(null, Date.now() + '-' + file.originalname),
+});
+const upload = multer({ storage });
+
+// Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true
@@ -47,74 +43,36 @@ mongoose.connect(process.env.MONGO_URI, {
   .then(() => console.log("✅ MongoDB connected"))
   .catch(err => console.error("❌ MongoDB connection error:", err));
 
-mongoose.connection.on('connected', () => {
-  console.log('✅ Mongoose connected to DB');
-});
-mongoose.connection.on('error', err => {
-  console.error('❌ Mongoose connection error:', err);
-});
-mongoose.connection.on('disconnected', () => {
-  console.warn('⚠️ Mongoose disconnected');
-});
-
-// ==============================
-// 📁 Ensure Upload Folder Exists
-// ==============================
-const uploadDir = 'public/uploads';
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
-}
-
-// ==============================
-// 📤 Multer File Upload Setup
-// ==============================
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'public/uploads/');
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + '-' + file.originalname);
-  }
-});
-const upload = multer({ storage });
-
-// ==============================
-// 🧾 Routes
-// ==============================
-
-// 📄 Homepage
-app.get('/', (req, res) => {
-  res.send('Server is running');
-});
-
-
-// 📋 Show Registration Form
+// GET: registration page
 app.get('/register', (req, res) => {
-  const uid = req.query.uid; // Read UID from URL query (?uid=xxxx)
+  const uid = req.query.uid || '';
   console.log("🌐 UID from query:", uid);
-  res.render('register', { uid }); // Pass UID to the EJS template
+  res.render('register', { uid });
 });
 
-// app.post('/register', upload.single('photo'), async (req, res) => {
-//   console.log("📥 POST body:", req.body);
-//   console.log("📥 UID from body:", req.body.uid);
-
-// // 📩 Handle Form Submission
+// POST: form submission
 app.post('/register', upload.single('photo'), async (req, res) => {
-  const { uid, name, matric, phone } = req.body;
-  const photo = req.file ? `/uploads/${req.file.filename}` : null;
-
-  console.log("📥 Received data:", { uid, name, matric, phone, photo });
-
   try {
-    if (!uid) return res.status(400).send('UID is required');
+    const { uid, name, matric, phone } = req.body;
+    const photo = req.file ? `/uploads/${req.file.filename}` : null;
+
+    console.log("📥 Received form data:", { uid, name, matric, phone, photo });
+
+    if (!uid) {
+      console.error("❗ UID missing from form");
+      return res.status(400).send('UID is required');
+    }
 
     const existing = await User.findOne({ uid });
-    if (existing) return res.send('Card is already registered.');
+    if (existing) {
+      console.log("⚠️ Card already registered");
+      return res.send('Card is already registered.');
+    }
 
     const newUser = new User({ uid, name, matric, phone, photo });
     await newUser.save();
 
+    console.log("✅ Registration successful!");
     res.send('✅ Registration successful!');
   } catch (error) {
     console.error("❌ Registration failed:", error);
@@ -122,22 +80,21 @@ app.post('/register', upload.single('photo'), async (req, res) => {
   }
 });
 
-
-// 👀 Show All Registered Users (as JSON)
+// GET: all users
 app.get('/users', async (req, res) => {
   try {
     const users = await User.find();
     res.json(users);
   } catch (err) {
-    console.error('❌ Error fetching users:', err);
     res.status(500).send('❌ Error fetching users');
   }
 });
 
-// ==============================
-// 🟢 Start Server
-// ==============================
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+// Default route
+app.get('/', (req, res) => {
+  res.send('✅ Server is running');
 });
+
+// Start server
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
