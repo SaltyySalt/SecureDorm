@@ -12,7 +12,7 @@ db = client["nfc_project"]
 collection = db["card_uids"]
 
 # Web registration base URL
-REGISTRATION_URL = "https://yourdomain.com/register"
+REGISTRATION_URL = "securedorm-production.up.railway.app"
 
 # Ensure UID is unique
 collection.create_index("uid", unique=True)
